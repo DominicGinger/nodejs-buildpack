@@ -148,9 +148,9 @@ var _ = Describe("Supply", func() {
 					err = supplier.LoadPackageJSON()
 					Expect(err).To(BeNil())
 
-					Expect(supplier.Node).To(Equal("node-y"))
-					Expect(supplier.Yarn).To(Equal("*"))
-					Expect(supplier.NPM).To(Equal("npm-x"))
+					Expect(supplier.NodeVersion).To(Equal("node-y"))
+					Expect(supplier.YarnVersion).To(Equal("*"))
+					Expect(supplier.NPMVersion).To(Equal("npm-x"))
 				})
 
 				It("logs the node and npm versions", func() {
@@ -201,9 +201,9 @@ var _ = Describe("Supply", func() {
 					err = supplier.LoadPackageJSON()
 					Expect(err).To(BeNil())
 
-					Expect(supplier.Node).To(Equal(""))
-					Expect(supplier.Yarn).To(Equal(""))
-					Expect(supplier.NPM).To(Equal(""))
+					Expect(supplier.NodeVersion).To(Equal(""))
+					Expect(supplier.YarnVersion).To(Equal(""))
+					Expect(supplier.NPMVersion).To(Equal(""))
 				})
 
 				It("logs that node and npm are not set", func() {
@@ -224,9 +224,9 @@ var _ = Describe("Supply", func() {
 					err = supplier.LoadPackageJSON()
 					Expect(err).To(BeNil())
 
-					Expect(supplier.Node).To(Equal(""))
-					Expect(supplier.Yarn).To(Equal(""))
-					Expect(supplier.NPM).To(Equal(""))
+					Expect(supplier.NodeVersion).To(Equal(""))
+					Expect(supplier.YarnVersion).To(Equal(""))
+					Expect(supplier.NPMVersion).To(Equal(""))
 				})
 
 				It("logs that node and npm are not set", func() {
@@ -250,7 +250,7 @@ var _ = Describe("Supply", func() {
 
 		Context("node version is *", func() {
 			It("warns that the node semver is dangerous", func() {
-				supplier.Node = "*"
+				supplier.NodeVersion = "*"
 				supplier.WarnNodeEngine()
 				Expect(buffer.String()).To(ContainSubstring("**WARNING** Dangerous semver range (*) in engines.node. See: http://docs.cloudfoundry.org/buildpacks/node/node-tips.html"))
 			})
@@ -258,7 +258,7 @@ var _ = Describe("Supply", func() {
 
 		Context("node version is >x", func() {
 			It("warns that the node semver is dangerous", func() {
-				supplier.Node = ">5"
+				supplier.NodeVersion = ">5"
 				supplier.WarnNodeEngine()
 				Expect(buffer.String()).To(ContainSubstring("**WARNING** Dangerous semver range (>) in engines.node. See: http://docs.cloudfoundry.org/buildpacks/node/node-tips.html"))
 			})
@@ -266,7 +266,7 @@ var _ = Describe("Supply", func() {
 
 		Context("node version is 'safe' semver", func() {
 			It("does not log anything", func() {
-				supplier.Node = "~>6"
+				supplier.NodeVersion = "~>6"
 				supplier.WarnNodeEngine()
 				Expect(buffer.String()).To(Equal(""))
 			})
@@ -297,7 +297,7 @@ var _ = Describe("Supply", func() {
 				dep := libbuildpack.Dependency{Name: "node", Version: "4.8.3"}
 				mockManifest.EXPECT().InstallDependency(dep, nodeTmpDir).Do(installNode).Return(nil)
 
-				supplier.Node = "~>4"
+				supplier.NodeVersion = "~>4"
 				err = supplier.InstallNode(nodeTmpDir)
 				Expect(err).To(BeNil())
 			})
@@ -306,7 +306,7 @@ var _ = Describe("Supply", func() {
 				dep := libbuildpack.Dependency{Name: "node", Version: "6.11.1"}
 				mockManifest.EXPECT().InstallDependency(dep, nodeTmpDir).Do(installNode).Return(nil)
 
-				supplier.Node = ">=6.11.1 <7.0.0"
+				supplier.NodeVersion = ">=6.11.1 <7.0.0"
 				err = supplier.InstallNode(nodeTmpDir)
 				Expect(err).To(BeNil())
 			})
@@ -315,7 +315,7 @@ var _ = Describe("Supply", func() {
 				dep := libbuildpack.Dependency{Name: "node", Version: "6.11.1"}
 				mockManifest.EXPECT().InstallDependency(dep, nodeTmpDir).Do(installNode).Return(nil)
 
-				supplier.Node = ">=6.11.1, <7.0"
+				supplier.NodeVersion = ">=6.11.1, <7.0"
 				err = supplier.InstallNode(nodeTmpDir)
 				Expect(err).To(BeNil())
 			})
@@ -324,7 +324,7 @@ var _ = Describe("Supply", func() {
 				dep := libbuildpack.Dependency{Name: "node", Version: "6.10.2"}
 				mockManifest.EXPECT().InstallDependency(dep, nodeTmpDir).Do(installNode).Return(nil)
 
-				supplier.Node = "6.10.*"
+				supplier.NodeVersion = "6.10.*"
 				err = supplier.InstallNode(nodeTmpDir)
 				Expect(err).To(BeNil())
 
@@ -346,7 +346,7 @@ var _ = Describe("Supply", func() {
 				mockManifest.EXPECT().DefaultVersion("node").Return(dep, nil)
 				mockManifest.EXPECT().InstallDependency(dep, nodeTmpDir).Do(installNode).Return(nil)
 
-				supplier.Node = ""
+				supplier.NodeVersion = ""
 
 				err = supplier.InstallNode(nodeTmpDir)
 				Expect(err).To(BeNil())
@@ -371,7 +371,7 @@ var _ = Describe("Supply", func() {
 			})
 
 			It("installs the only version in the manifest", func() {
-				supplier.Yarn = ""
+				supplier.YarnVersion = ""
 
 				err = supplier.InstallYarn()
 				Expect(err).To(BeNil())
@@ -379,7 +379,7 @@ var _ = Describe("Supply", func() {
 			})
 
 			It("creates a symlink in <depDir>/bin", func() {
-				supplier.Yarn = ""
+				supplier.YarnVersion = ""
 				err = supplier.InstallYarn()
 				Expect(err).To(BeNil())
 
@@ -405,7 +405,7 @@ var _ = Describe("Supply", func() {
 			})
 
 			It("installs the correct version from the manifest", func() {
-				supplier.Yarn = "0.32.x"
+				supplier.YarnVersion = "0.32.x"
 				err = supplier.InstallYarn()
 				Expect(err).To(BeNil())
 
@@ -420,7 +420,7 @@ var _ = Describe("Supply", func() {
 			})
 
 			It("returns an error", func() {
-				supplier.Yarn = "1.0.x"
+				supplier.YarnVersion = "1.0.x"
 				err = supplier.InstallYarn()
 				Expect(err).ToNot(BeNil())
 				Expect(err.Error()).To(Equal("package.json requested 1.0.x, buildpack only includes yarn version 0.32.5"))
@@ -447,7 +447,7 @@ var _ = Describe("Supply", func() {
 		Context("npm version is set", func() {
 			Context("requested version is already installed", func() {
 				It("Uses the version of npm packaged with node", func() {
-					supplier.NPM = "1.2.3"
+					supplier.NPMVersion = "1.2.3"
 
 					err = supplier.InstallNPM()
 					Expect(err).To(BeNil())
@@ -458,12 +458,436 @@ var _ = Describe("Supply", func() {
 
 			It("installs the requested npm version using packaged npm", func() {
 				mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "npm", "install", "--unsafe-perm", "--quiet", "-g", "npm@4.5.6").Return(nil)
-				supplier.NPM = "4.5.6"
+				supplier.NPMVersion = "4.5.6"
 
 				err = supplier.InstallNPM()
 				Expect(err).To(BeNil())
 
 				Expect(buffer.String()).To(ContainSubstring("Downloading and installing npm 4.5.6 (replacing version 1.2.3)..."))
+			})
+		})
+	})
+
+	Describe("ReadPackageJSON", func() {
+
+		Context("package.json has prebuild script", func() {
+			BeforeEach(func() {
+				packageJSON := `
+{
+  "scripts" : {
+		"script": "script",
+		"heroku-prebuild": "makestuff",
+		"thing": "thing"
+	}
+}
+`
+				Expect(ioutil.WriteFile(filepath.Join(buildDir, "package.json"), []byte(packageJSON), 0644)).To(Succeed())
+			})
+
+			It("sets PreBuild", func() {
+				Expect(supplier.ReadPackageJSON()).To(Succeed())
+				Expect(supplier.PreBuild).To(Equal("makestuff"))
+			})
+		})
+
+		Context("package.json has postbuild script", func() {
+			BeforeEach(func() {
+				packageJSON := `
+{
+  "scripts" : {
+		"script": "script",
+		"heroku-postbuild": "logstuff",
+		"thing": "thing"
+	}
+}
+`
+				Expect(ioutil.WriteFile(filepath.Join(buildDir, "package.json"), []byte(packageJSON), 0644)).To(Succeed())
+			})
+
+			It("sets PostBuild", func() {
+				Expect(supplier.ReadPackageJSON()).To(Succeed())
+				Expect(supplier.PostBuild).To(Equal("logstuff"))
+			})
+		})
+
+		Context("package.json has start script", func() {
+			BeforeEach(func() {
+				packageJSON := `
+{
+  "scripts" : {
+		"script": "script",
+		"start": "start-my-app",
+		"thing": "thing"
+	}
+}
+`
+				Expect(ioutil.WriteFile(filepath.Join(buildDir, "package.json"), []byte(packageJSON), 0644)).To(Succeed())
+			})
+
+			It("sets StartScript", func() {
+				Expect(supplier.ReadPackageJSON()).To(Succeed())
+				Expect(supplier.StartScript).To(Equal("start-my-app"))
+			})
+		})
+
+		Context("package.json does not exist", func() {
+			It("warns user", func() {
+				Expect(supplier.ReadPackageJSON()).To(Succeed())
+				Expect(buffer.String()).To(ContainSubstring("**WARNING** No package.json found"))
+			})
+		})
+
+		Context("yarn.lock exists", func() {
+			BeforeEach(func() {
+				Expect(ioutil.WriteFile(filepath.Join(buildDir, "yarn.lock"), []byte("{}"), 0644)).To(Succeed())
+			})
+			It("sets UseYarn to true", func() {
+				Expect(supplier.ReadPackageJSON()).To(Succeed())
+				Expect(supplier.UseYarn).To(BeTrue())
+			})
+		})
+
+		Context("yarn.lock does not exist", func() {
+			It("sets UseYarn to false", func() {
+				Expect(supplier.ReadPackageJSON()).To(Succeed())
+				Expect(supplier.UseYarn).To(BeFalse())
+			})
+		})
+
+		Context("node_modules exists", func() {
+			BeforeEach(func() {
+				Expect(os.MkdirAll(filepath.Join(buildDir, "node_modules"), 0755)).To(Succeed())
+			})
+			It("sets NPMRebuild to true", func() {
+				Expect(supplier.ReadPackageJSON()).To(Succeed())
+				Expect(supplier.NPMRebuild).To(BeTrue())
+			})
+		})
+
+		Context("node_modules does not exist", func() {
+			It("sets NPMRebuild to false", func() {
+				Expect(supplier.ReadPackageJSON()).To(Succeed())
+				Expect(supplier.NPMRebuild).To(BeFalse())
+			})
+		})
+
+		Context("dev dependencies exist", func() {
+			BeforeEach(func() {
+				packageJSON := `
+{
+	"devDependencies": {
+    "logger": "^0.0.1"
+  }
+}
+`
+				Expect(ioutil.WriteFile(filepath.Join(buildDir, "package.json"), []byte(packageJSON), 0644)).To(Succeed())
+			})
+			It("sets HasDevDependencies to true", func() {
+				Expect(supplier.ReadPackageJSON()).To(Succeed())
+				Expect(supplier.HasDevDependencies).To(BeTrue())
+			})
+		})
+
+		Context("dev dependencies do not exist", func() {
+			It("sets HasDevDependencies to false", func() {
+				Expect(supplier.ReadPackageJSON()).To(Succeed())
+				Expect(supplier.HasDevDependencies).To(BeFalse())
+			})
+		})
+	})
+
+	Describe("TipVendorDependencies", func() {
+		Context("node_modules exists and has subdirectories", func() {
+			BeforeEach(func() {
+				Expect(os.MkdirAll(filepath.Join(buildDir, "node_modules", "exciting_module"), 0755)).To(BeNil())
+			})
+
+			It("does not log anything", func() {
+				Expect(supplier.TipVendorDependencies()).To(BeNil())
+				Expect(buffer.String()).To(Equal(""))
+			})
+		})
+
+		Context("node_modules exists and has NO subdirectories", func() {
+			BeforeEach(func() {
+				Expect(os.MkdirAll(filepath.Join(buildDir, "node_modules"), 0755)).To(BeNil())
+				Expect(ioutil.WriteFile(filepath.Join(buildDir, "node_modules", "a_file"), []byte("content"), 0644)).To(BeNil())
+			})
+
+			It("logs a pro tip", func() {
+				Expect(supplier.TipVendorDependencies()).To(BeNil())
+				Expect(buffer.String()).To(ContainSubstring("PRO TIP: It is recommended to vendor the application's Node.js dependencies"))
+				Expect(buffer.String()).To(ContainSubstring("http://docs.cloudfoundry.org/buildpacks/node/index.html#vendoring"))
+			})
+		})
+
+		Context("node_modules does not exist", func() {
+			It("logs a pro tip", func() {
+				Expect(supplier.TipVendorDependencies()).To(BeNil())
+				Expect(buffer.String()).To(ContainSubstring("PRO TIP: It is recommended to vendor the application's Node.js dependencies"))
+				Expect(buffer.String()).To(ContainSubstring("http://docs.cloudfoundry.org/buildpacks/node/index.html#vendoring"))
+			})
+		})
+	})
+
+	Describe("ListNodeConfig", func() {
+		DescribeTable("outputs relevant env vars",
+			func(key string, value string, expected string) {
+				supplier.ListNodeConfig([]string{fmt.Sprintf("%s=%s", key, value)})
+				Expect(buffer.String()).To(Equal(expected))
+			},
+
+			Entry("NPM_CONFIG_", "NPM_CONFIG_THING", "someval", "       NPM_CONFIG_THING=someval\n"),
+			Entry("YARN_", "YARN_KEY", "aval", "       YARN_KEY=aval\n"),
+			Entry("NODE_", "NODE_EXCITING", "newval", "       NODE_EXCITING=newval\n"),
+			Entry("NOT_RELEVANT", "NOT_RELEVANT", "anything", ""),
+		)
+
+		It("warns about NODE_ENV override", func() {
+			supplier.ListNodeConfig([]string{"NPM_CONFIG_PRODUCTION=true", "NODE_ENV=development"})
+			Expect(buffer.String()).To(ContainSubstring("npm scripts will see NODE_ENV=production (not 'development')"))
+			Expect(buffer.String()).To(ContainSubstring("https://docs.npmjs.com/misc/config#production"))
+		})
+	})
+
+	Describe("WarnUntrackedDependencies", func() {
+		var (
+			logfile  *os.File
+			contents string
+		)
+
+		JustBeforeEach(func() {
+			logfile, err = ioutil.TempFile("", "nodejs-buildpack.log")
+			Expect(err).To(BeNil())
+
+			_, err = logfile.Write([]byte(contents))
+			Expect(err).To(BeNil())
+			Expect(logfile.Sync()).To(Succeed())
+
+			supplier.Logfile = logfile
+			Expect(supplier.WarnUntrackedDependencies()).To(Succeed())
+		})
+
+		AfterEach(func() {
+			Expect(logfile.Close()).To(Succeed())
+			Expect(os.Remove(logfile.Name())).To(Succeed())
+		})
+
+		Context("gulp not found", func() {
+			BeforeEach(func() {
+				contents = "stuff\ngulp: not found\nstuff\n"
+			})
+			It("warns the user", func() {
+				Expect(buffer.String()).To(ContainSubstring("Gulp may not be tracked in package.json"))
+			})
+		})
+
+		Context("gulp command not found", func() {
+			BeforeEach(func() {
+				contents = "stuff\ngulp: command not found\nstuff\n"
+			})
+			It("warns the user", func() {
+				Expect(buffer.String()).To(ContainSubstring("Gulp may not be tracked in package.json"))
+			})
+		})
+		Context("bower not found", func() {
+			BeforeEach(func() {
+				contents = "stuff\nbower: not found\nstuff\n"
+			})
+			It("warns the user", func() {
+				Expect(buffer.String()).To(ContainSubstring("Bower may not be tracked in package.json"))
+			})
+		})
+
+		Context("bower command not found", func() {
+			BeforeEach(func() {
+				contents = "stuff\nbower: command not found\nstuff\n"
+			})
+			It("warns the user", func() {
+				Expect(buffer.String()).To(ContainSubstring("Bower may not be tracked in package.json"))
+			})
+		})
+
+		Context("grunt not found", func() {
+			BeforeEach(func() {
+				contents = "stuff\ngrunt: not found\nstuff\n"
+			})
+			It("warns the user", func() {
+				Expect(buffer.String()).To(ContainSubstring("Grunt may not be tracked in package.json"))
+			})
+		})
+
+		Context("grunt command not found", func() {
+			BeforeEach(func() {
+				contents = "stuff\ngrunt: command not found\nstuff\n"
+			})
+			It("warns the user", func() {
+				Expect(buffer.String()).To(ContainSubstring("Grunt may not be tracked in package.json"))
+			})
+		})
+
+		Context("no 'not found' errors", func() {
+			BeforeEach(func() {
+				contents = "stuff\ngood command\nstuff\n"
+			})
+			It("does not warn the user", func() {
+				Expect(buffer.String()).To(BeEmpty())
+			})
+		})
+	})
+
+	Describe("WarnMissingDevDeps", func() {
+		var (
+			logfile  *os.File
+			contents string
+		)
+
+		JustBeforeEach(func() {
+			logfile, err = ioutil.TempFile("", "nodejs-buildpack.log")
+			Expect(err).To(BeNil())
+
+			_, err = logfile.Write([]byte(contents))
+			Expect(err).To(BeNil())
+			Expect(logfile.Sync()).To(Succeed())
+
+			supplier.Logfile = logfile
+			Expect(supplier.WarnMissingDevDeps()).To(Succeed())
+		})
+
+		AfterEach(func() {
+			Expect(logfile.Close()).To(Succeed())
+			Expect(os.Remove(logfile.Name())).To(Succeed())
+		})
+
+		Context("cannot find module", func() {
+			BeforeEach(func() {
+				contents = "stuff\ncannot find module\nstuff\n"
+			})
+
+			It("warns the user", func() {
+				Expect(buffer.String()).To(ContainSubstring("A module may be missing from 'dependencies' in package.json"))
+			})
+
+			Context("$NPM_CONFIG_PRODUCTION == true", func() {
+				BeforeEach(func() {
+					Expect(os.Setenv("NPM_CONFIG_PRODUCTION", "true")).To(Succeed())
+				})
+				AfterEach(func() {
+					Expect(os.Unsetenv("NPM_CONFIG_PRODUCTION")).To(Succeed())
+				})
+
+				Context("package.json has dev dependencies", func() {
+					BeforeEach(func() {
+						supplier.HasDevDependencies = true
+					})
+
+					It("warns the user", func() {
+						Expect(buffer.String()).To(ContainSubstring("This module may be specified in 'devDependencies' instead of 'dependencies'"))
+						Expect(buffer.String()).To(ContainSubstring("See: https://devcenter.heroku.com/articles/nodejs-support#devdependencies"))
+					})
+				})
+
+				Context("package.json does not gave dev dependencies", func() {
+					BeforeEach(func() {
+						supplier.HasDevDependencies = false
+					})
+
+					It("does not warn the user", func() {
+						Expect(buffer.String()).ToNot(ContainSubstring("devDependencies"))
+						Expect(buffer.String()).ToNot(ContainSubstring("devdependencies"))
+					})
+				})
+			})
+		})
+
+		Context("no missing module errors", func() {
+			BeforeEach(func() {
+				contents = "stuff\nstuff\n"
+			})
+			It("does not warn the user", func() {
+				Expect(buffer.String()).To(BeEmpty())
+			})
+		})
+	})
+
+	Describe("BuildDependencies", func() {
+		Context("yarn.lock exists", func() {
+			BeforeEach(func() {
+				supplier.UseYarn = true
+				mockYarn.EXPECT().Build().Return(nil)
+			})
+
+			It("runs yarn install", func() {
+				Expect(supplier.BuildDependencies()).To(Succeed())
+			})
+
+			Context("prebuild is specified", func() {
+				BeforeEach(func() {
+					finalizer.PreBuild = "prescriptive"
+				})
+
+				It("runs the prebuild script", func() {
+					mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "yarn", "run", "prescriptive")
+					Expect(supplier.BuildDependencies()).To(Succeed())
+					Expect(buffer.String()).To(ContainSubstring("Running prescriptive (yarn)"))
+				})
+			})
+
+			Context("postbuild is specified", func() {
+				BeforeEach(func() {
+					supplier.PostBuild = "descriptive"
+				})
+
+				It("runs the postbuild script", func() {
+					mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "yarn", "run", "descriptive")
+					Expect(supplier.BuildDependencies()).To(Succeed())
+					Expect(buffer.String()).To(ContainSubstring("Running descriptive (yarn)"))
+				})
+			})
+		})
+
+		Context("yarn.lock does not exist", func() {
+			It("runs npm install", func() {
+				mockNPM.EXPECT().Build().Return(nil)
+				Expect(supplier.BuildDependencies()).To(Succeed())
+			})
+
+			Context("prebuild is specified", func() {
+				BeforeEach(func() {
+					mockNPM.EXPECT().Build().Return(nil)
+					supplier.PreBuild = "prescriptive"
+				})
+
+				It("runs the prebuild script", func() {
+					mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "npm", "run", "prescriptive", "--if-present")
+					Expect(supplier.BuildDependencies()).To(Succeed())
+					Expect(buffer.String()).To(ContainSubstring("Running prescriptive (npm)"))
+				})
+			})
+
+			Context("npm rebuild is specified", func() {
+				BeforeEach(func() {
+					mockNPM.EXPECT().Rebuild().Return(nil)
+					supplier.NPMRebuild = true
+				})
+
+				It("runs npm rebuild ", func() {
+					Expect(supplier.BuildDependencies()).To(Succeed())
+					Expect(buffer.String()).To(ContainSubstring("Prebuild detected (node_modules already exists)"))
+				})
+			})
+
+			Context("postbuild is specified", func() {
+				BeforeEach(func() {
+					mockNPM.EXPECT().Build().Return(nil)
+					supplier.PostBuild = "descriptive"
+				})
+
+				It("runs the postbuild script", func() {
+					mockCommand.EXPECT().Execute(buildDir, gomock.Any(), gomock.Any(), "npm", "run", "descriptive", "--if-present")
+					Expect(supplier.BuildDependencies()).To(Succeed())
+					Expect(buffer.String()).To(ContainSubstring("Running descriptive (npm)"))
+				})
 			})
 		})
 	})
